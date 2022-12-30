@@ -10,7 +10,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "console.table": "0.10.0",
+    "mysql2": "2.3.3",
     "jest": "^24.9.0",
-    "inquirer": "8.2.4"
+    "inquirer": "8.2.4",
+    "dotenv": "16.0.3"
   }
 }
