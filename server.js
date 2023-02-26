@@ -83,19 +83,37 @@ function viewEmp(){
     )
 };
 function addEmp(){
-    inquirer.prompt([
-        {
-            type: 'input',
-            message: "Please enter the employee's first name?",
-            name: 'firstName'
-        },
-        {
-            type: 'input',
-            message: "Please enter the employee's last name?",
-            name: 'lastName'
-        }
-    ])
-};
+    db.query(`SELECT * FROM roles`, function (err, results){
+        db.query(`SELECT * FROM employees`, function (err, empResults){
+            let roleList = results.map((roles) => {
+                return {name: roles.title, value: roles.id};
+            });
+        inquirer.prompt([
+            {
+                type: 'input',
+                message: "Please enter the employee's first name?",
+                name: 'newFirstName'
+            },
+            {
+                type: 'input',
+                message: "Please enter the employee's last name?",
+                name: 'newLastName'
+            },
+            {
+                type: 'list',
+                name: 'newEmpRole',
+                message: 'What is their role?',
+                choices: roleList,
+            },
+        ])
+        .then((responses) => {
+            db.query(`INSERT INTO employee (first_name, last_name, role_id)
+            VALUES ('${responses.newFirstName}','${responses.newLastName}', '${responses.newEmpRole}')`);
+            mainMenu();
+        })
+    })
+    })};
+    
 function viewRole(){
     db.query(
         `
@@ -115,13 +133,34 @@ function viewRole(){
     )
 };
 function addRole(){
+    db.query(`SELECT * FROM department`, function (err, results) {
+        let departmentList = results.map((departments) => {
+          return { name: departments.name, value: departments.id };
+        });
     inquirer.prompt([
         {
             type: 'input',
             message: "Please enter the role title",
-            name: 'role'
+            name: 'addNewRole'
+        },
+        {
+            type: 'input',
+            message: 'What is the salary of the new role?',
+            name: 'addNewSalary'
+        },
+        {
+            type: 'list',
+            name:'addRollDep',
+            message: 'What department does this role belong in?',
+            choices: departmentList
         }
     ])
+    .then((responses) => {
+        db.query(`INSERT INTO roles (title, salary, department_id)
+        VALUES ('${responses.addNewRole}', '${responses.addNewSalary}', '${responses.addRollDep}')`);
+        mainMenu();
+      });
+    })
 };
 function viewDep(){
     db.query(
@@ -142,11 +181,14 @@ function addDep(){
         {
             type: 'input',
             message: "Please enter the department name?",
-            name: 'department'
+            name: 'newDepartmentName'
         },
     ])
+    .then((depChoice) =>{
+        db.query(`INSERT INTO department (department_name)
+        VALUES ('${depChoice.newDepartmentName}')`);
+        mainMenu();
+    })
 };
-function updateRole(){
-    console.log("hello");
-};
+
 mainMenu();
